@@ -21,7 +21,6 @@ def add_holding(conn, holding):
     cursor = conn.cursor()
     cursor.execute("INSERT INTO holdings VALUES(?, ?, ?, ?)",
                    (holding.ticker, holding.quantity, holding.buy_price, holding.buy_date)
-    )
-
-
+    )   
+    
     conn.commit()
