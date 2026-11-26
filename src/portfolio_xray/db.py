@@ -1,8 +1,12 @@
 import sqlite3
+from pathlib import Path
+import pandas as pd
 
 
+DB_PATH = Path(__file__).parent.parent / "portfolio.db"   # zawsze src/portfolio.db
 
-def connect(path):
+
+def connect(path=DB_PATH):
     return sqlite3.connect(path)
 
 def init_db(conn):
@@ -19,8 +23,23 @@ def init_db(conn):
 
 def add_holding(conn, holding):
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO holdings VALUES(?, ?, ?, ?)",
+    cursor.execute("INSERT INTO holdings (ticker, quantity, buy_price, buy_date) VALUES(?, ?, ?, ?)",
                    (holding.ticker, holding.quantity, holding.buy_price, holding.buy_date)
     )   
     
+    conn.commit()  
+
+    return holding.id
+
+def get_holdings(conn):
+    return pd.read_sql_query("SELECT * FROM holdings", conn)    
+
+def delete_holding(conn, holding):
+
+    cursor = conn.execute("DELETE FROM holdings WHERE id = ?", (holding.id,))
     conn.commit()
+    return cursor.rowcount > 0
+
+
+
+    
